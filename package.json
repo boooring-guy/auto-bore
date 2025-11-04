@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "inngest:dev": "pnpm dlx inngest-cli@latest dev",
     "dev": "next dev",
+    "dev:all": "mprocs",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
