@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { Button, type ButtonProps } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Loader2, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export interface SignOutButtonProps extends Omit<ButtonProps, "onClick"> {
+export interface SignOutButtonProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> {
   /**
    * Callback URL after successful sign out
    */
@@ -96,7 +97,10 @@ export function SignOutButton({
         router.refresh();
       }
     } catch (error) {
-      const err = error instanceof Error ? error : new Error("An unexpected error occurred");
+      const err =
+        error instanceof Error
+          ? error
+          : new Error("An unexpected error occurred");
       onSignOutError?.(err);
       toast.error("An unexpected error occurred");
     } finally {
@@ -125,4 +129,3 @@ export function SignOutButton({
     </Button>
   );
 }
-
