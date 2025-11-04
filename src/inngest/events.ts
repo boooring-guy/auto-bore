@@ -6,7 +6,7 @@
  */
 
 export const EVENTS = {
-  TEST_HELLO_WORLD: "test/hello.world",
+  EXECUTE_AI: "ai/execute",
 
   CREATE_WORKFLOW: "workflow/create",
   // Add more events here as needed

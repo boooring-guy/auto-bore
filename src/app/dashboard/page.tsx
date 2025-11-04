@@ -14,6 +14,22 @@ export default function DashboardPage() {
   const { mutate: createWorkflow } = useMutation(
     trpc.createWorkflow.mutationOptions()
   );
+  const testAIMutation = useMutation(
+    trpc.testAI.mutationOptions({
+      onSuccess: () => {
+        toast.success("AI JOB queued successfully");
+      },
+      onError: () => {
+        toast.error("Failed to queue AI job");
+      },
+    })
+  );
+
+  const handleTestAI = () => {
+    toast.message("AI testing started...");
+    testAIMutation.mutate();
+  };
+
   const handleCreateWorkflow = () => {
     toast.loading("Workflow creation started...");
     createWorkflow(
@@ -26,7 +42,7 @@ export default function DashboardPage() {
           // PRBLEM: will not know when the workflow is completed
           toast.success("Workflow creation completed successfully");
           toast.dismiss();
-        },  
+        },
         onError: () => {
           toast.error("Failed to create workflow");
           toast.dismiss();
@@ -51,6 +67,13 @@ export default function DashboardPage() {
       </SignOutButton>
       <Button variant={"ghost"} onClick={handleCreateWorkflow}>
         Create Workflow
+      </Button>
+      <Button
+        disabled={testAIMutation.isPending}
+        variant={"outline"}
+        onClick={handleTestAI}
+      >
+        Test AI
       </Button>
     </div>
   );
