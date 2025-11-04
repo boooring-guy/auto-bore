@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Zap } from "lucide-react";
 import { useAuth, ProfileButton, LoginButton } from "@/modules/auth";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { Logo } from "@/components/logo";
 
 export function Navigation() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -14,12 +16,7 @@ export function Navigation() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex items-center justify-center size-10 rounded-lg bg-linear-to-br from-primary to-primary/60">
-                <Zap className="size-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                Auto_bore
-              </span>
+              <Logo variant="full" size="md" useColor />
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-6">
@@ -43,6 +40,7 @@ export function Navigation() {
             </Link>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeSwitcher />
             {isLoading ? (
               <div className="flex items-center gap-3">
                 <div className="size-8 rounded-full bg-muted animate-pulse" />
