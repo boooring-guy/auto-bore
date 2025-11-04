@@ -5,20 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 export function useSubscription() {
   const { user } = useUser();
   const userId = user?.id;
-  if (!userId) {
-    return {
-      data: null,
-      isLoading: false,
-      isError: true,
-      error: new Error("User not found"),
-    };
-  }
+
   return useQuery({
     queryKey: ["subscription", userId], // to avoid hydration errors when the user is not logged in or signed in with another account
     queryFn: async () => {
       const { data } = await authClient.customer.state();
       return data;
     },
+    enabled: !!userId, // Only run the query when userId exists
   });
 }
 

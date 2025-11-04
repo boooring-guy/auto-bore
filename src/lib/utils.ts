@@ -1,10 +1,10 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { nanoid } from "nanoid";
-import * as Sentry from "@sentry/nextjs";
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+import { nanoid } from "nanoid"
+import * as Sentry from "@sentry/nextjs"
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 /**
@@ -14,9 +14,9 @@ export function cn(...inputs: ClassValue[]) {
  */
 export const TABLE_PREFIX_MAP = {
   workflows: "wfl",
-} as const;
+} as const
 
-export type TableName = keyof typeof TABLE_PREFIX_MAP;
+export type TableName = keyof typeof TABLE_PREFIX_MAP
 
 /**
  * Generates a unique ID with a table-specific prefix using nanoid
@@ -28,8 +28,8 @@ export type TableName = keyof typeof TABLE_PREFIX_MAP;
  * ```
  */
 export function generateId(table: TableName, length: number = 6): string {
-  const prefix = TABLE_PREFIX_MAP[table];
-  return `${prefix}_${nanoid(length)}`;
+  const prefix = TABLE_PREFIX_MAP[table]
+  return `${prefix}_${nanoid(length)}`
 }
 
 /**
@@ -46,24 +46,37 @@ export const sentryLog = {
     message: string,
     context?: { log_source?: string; [key: string]: unknown }
   ) => {
-    Sentry.logger.info(message, context || {});
+    Sentry.logger.info(message, context || {})
+    // devlopment env log to console
+    if (process.env.NODE_ENV === "development") {
+      console.log(message, context || {})
+    }
   },
   warn: (
     message: string,
     context?: { log_source?: string; [key: string]: unknown }
   ) => {
-    Sentry.logger.warn(message, context || {});
+    Sentry.logger.warn(message, context || {})
+    if (process.env.NODE_ENV === "development") {
+      console.warn(message, context || {})
+    }
   },
   error: (
     message: string,
     context?: { log_source?: string; [key: string]: unknown }
   ) => {
-    Sentry.logger.error(message, context || {});
+    Sentry.logger.error(message, context || {})
+    if (process.env.NODE_ENV === "development") {
+      console.error(message, context || {})
+    }
   },
   debug: (
     message: string,
     context?: { log_source?: string; [key: string]: unknown }
   ) => {
-    Sentry.logger.debug(message, context || {});
+    Sentry.logger.debug(message, context || {})
+    if (process.env.NODE_ENV === "development") {
+      console.debug(message, context || {})
+    }
   },
-};
+}
