@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 const rubikSans = Rubik({
   variable: "--font-rubik",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const geistMono = Geist_Mono({
@@ -29,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${rubikSans.variable} ${geistMono.variable} antialiased`}
+        className={`${rubikSans.className} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"

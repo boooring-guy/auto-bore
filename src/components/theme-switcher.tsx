@@ -80,7 +80,7 @@ export function ThemeSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="w-9 h-9 ">
           {CurrentIcon ? (
-            <CurrentIcon className="h-4 w-4 border" />
+            <CurrentIcon className="h-4 w-4 " />
           ) : (
             <ThemeCircle color={currentColor || themeColors.azure} />
           )}
