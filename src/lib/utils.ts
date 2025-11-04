@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { nanoid } from "nanoid";
+import * as Sentry from "@sentry/nextjs";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,3 +31,39 @@ export function generateId(table: TableName, length: number = 6): string {
   const prefix = TABLE_PREFIX_MAP[table];
   return `${prefix}_${nanoid(length)}`;
 }
+
+/**
+ * Sentry logger utility for easy logging throughout the codebase
+ * @example
+ * ```ts
+ * import { sentryLog } from "@/lib/utils";
+ * sentryLog.info("User logged in", { log_source: "auth" });
+ * sentryLog.error("Failed to fetch data", { log_source: "api" });
+ * ```
+ */
+export const sentryLog = {
+  info: (
+    message: string,
+    context?: { log_source?: string; [key: string]: unknown }
+  ) => {
+    Sentry.logger.info(message, context || {});
+  },
+  warn: (
+    message: string,
+    context?: { log_source?: string; [key: string]: unknown }
+  ) => {
+    Sentry.logger.warn(message, context || {});
+  },
+  error: (
+    message: string,
+    context?: { log_source?: string; [key: string]: unknown }
+  ) => {
+    Sentry.logger.error(message, context || {});
+  },
+  debug: (
+    message: string,
+    context?: { log_source?: string; [key: string]: unknown }
+  ) => {
+    Sentry.logger.debug(message, context || {});
+  },
+};

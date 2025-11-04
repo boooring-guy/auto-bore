@@ -4,7 +4,7 @@ import { generateId } from "@/lib/utils";
 import { SignOutButton } from "@/modules/auth";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import React from "react";
+import * as Sentry from "@sentry/nextjs";
 import { toast } from "sonner";
 
 export default function DashboardPage() {

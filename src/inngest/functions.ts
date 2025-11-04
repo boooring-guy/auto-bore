@@ -4,6 +4,8 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
+import * as Sentry from "@sentry/nextjs";
+import { sentryLog } from "@/lib/utils";
 
 const google = createGoogleGenerativeAI({
   apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY!,
@@ -19,6 +21,7 @@ const anthropic = createAnthropic({
 export const executeAi = inngest.createFunction(
   {
     id: "execute-ai",
+    retries: 1, // Todo: change to 3 in production
   },
   {
     event: EVENTS.EXECUTE_AI,
@@ -33,6 +36,11 @@ export const executeAi = inngest.createFunction(
         system:
           "You are a helpful assistant that can answer questions and help with tasks.",
         prompt: "Write a vegetarian lasagna recipe for 4 people.",
+        experimental_telemetry: {
+          isEnabled: true,
+          recordInputs: true,
+          recordOutputs: true,
+        },
       }
     );
     const { steps: openaiSteps } = await step.ai.wrap(
@@ -43,6 +51,11 @@ export const executeAi = inngest.createFunction(
         system:
           "You are a helpful assistant that can answer questions and help with tasks.",
         prompt: "Write a vegetarian lasagna recipe for 4 people.",
+        experimental_telemetry: {
+          isEnabled: true,
+          recordInputs: true,
+          recordOutputs: true,
+        },
       }
     );
     const { steps: anthropicSteps } = await step.ai.wrap(
@@ -53,8 +66,14 @@ export const executeAi = inngest.createFunction(
         system:
           "You are a helpful assistant that can answer questions and help with tasks.",
         prompt: "Write a vegetarian lasagna recipe for 4 people.",
+        experimental_telemetry: {
+          isEnabled: true,
+          recordInputs: true,
+          recordOutputs: true,
+        },
       }
     );
+
     return {
       gemini: geminiSteps,
       openai: openaiSteps,

@@ -6,6 +6,7 @@ import { EVENTS } from "@/inngest/events";
 import { inngest } from "@/inngest/client";
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
+import { TRPCError } from "@trpc/server";
 
 export const appRouter = createTRPCRouter({
   getUsers: protectedProcedure.query(async ({ ctx }) => {
@@ -17,6 +18,10 @@ export const appRouter = createTRPCRouter({
 
   // Test AI from google
   testAI: baseProcedure.mutation(async ({ ctx }) => {
+    // throw new TRPCError({
+    //   code: "BAD_REQUEST",
+    //   message: "AI testing is not implemented yet for testing purpose",
+    // });
     await inngest.send({
       name: EVENTS.EXECUTE_AI,
       data: {},
