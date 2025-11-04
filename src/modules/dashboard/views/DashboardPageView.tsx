@@ -17,17 +17,20 @@ export function DashboardPageView() {
   );
   const testAIMutation = useMutation(
     trpc.testAI.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast.success("AI JOB queued successfully");
+        console.log(data, "data");
       },
-      onError: () => {
-        toast.error("Failed to queue AI job");
+      onError: (error) => {
+        toast.error("Failed to queue AI job", {
+          description: error.message,
+          richColors: true,
+        });
       },
     })
   );
 
   const handleTestAI = () => {
-    toast.message("AI testing started...");
     testAIMutation.mutate();
   };
 
@@ -79,4 +82,3 @@ export function DashboardPageView() {
     </div>
   );
 }
-

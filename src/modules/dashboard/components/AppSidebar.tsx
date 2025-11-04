@@ -14,6 +14,8 @@ import {
   ClockIcon,
   LockIcon,
   StarIcon,
+  Loader2,
+  LogInIcon,
 } from "lucide-react";
 
 import {
@@ -34,8 +36,10 @@ import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Logo } from "@/components/logo";
 import { usePathname, useRouter } from "next/navigation";
-import { ProfileButton } from "@/modules/auth";
+import { LoginButton, ProfileButton, useUser } from "@/modules/auth";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { authClient } from "@/lib/auth-client";
+import { useHasActiveSubscription } from "@/modules/subscriptions/hooks/useSubscription";
 
 const sidebarItems = [
   {
@@ -65,8 +69,10 @@ export function AppSidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const { state } = useSidebar();
+  const { isLoading: isLoadingUser, session, user } = useUser();
   const isCollapsed = state === "collapsed";
-
+  const { hasActiveSubscription, isLoading: isLoadingSubscription } =
+    useHasActiveSubscription();
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="">
@@ -119,33 +125,41 @@ export function AppSidebar() {
         </ScrollArea>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenuItem>
-          {/* Upgrade to Pro */}
-          <SidebarMenuButton
-            variant={"default"}
-            asChild
-            className="gap-x-4 h-10 px-4"
-            tooltip={"Upgrade to Pro"}
-          >
-            <Link href="/upgrade-to-pro">
+        {!hasActiveSubscription && !isLoadingSubscription && (
+          <SidebarMenuItem>
+            {/* Upgrade to Pro */}
+            <SidebarMenuButton
+              variant={"default"}
+              className="gap-x-4 h-10 px-4"
+              tooltip={"Upgrade to Pro"}
+              onClick={() => {
+                authClient.checkout({
+                  slug: "pro",
+                });
+              }}
+            >
               <StarIcon className="size-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
                 Upgrade to Pro
               </span>
-            </Link>
-          </SidebarMenuButton>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )}
+
+        <SidebarMenuItem>
           {/* Billing */}
           <SidebarMenuButton
-            asChild
             className="gap-x-4 h-10 px-4"
             tooltip={"Billing"}
+            onClick={() => {
+              authClient.customer.portal();
+            }}
           >
-            <Link href="/billing">
-              <CreditCardIcon className="size-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Billing</span>
-            </Link>
+            <CreditCardIcon className="size-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Billing</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
+
         {/* Settings */}
         <SidebarMenuItem>
           <SidebarMenuButton
@@ -169,7 +183,18 @@ export function AppSidebar() {
               asChild
               className={`gap-x-4 h-10 px-4 ${isCollapsed ? "" : "flex-1"}`}
             >
-              <ProfileButton variant="sidebar" />
+              {isLoadingUser && !user ? (
+                <div className="flex items-center justify-center rounded-full border border-border bg-background">
+                  <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                </div>
+              ) : user ? (
+                <ProfileButton variant="sidebar" />
+              ) : (
+                <LoginButton variant="default" size="sm">
+                  <LogInIcon className="size-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Login</span>
+                </LoginButton>
+              )}
             </SidebarMenuButton>
             <SidebarMenuButton
               asChild

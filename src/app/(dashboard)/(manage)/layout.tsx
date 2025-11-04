@@ -10,7 +10,6 @@ const ManageLayout = ({ children }: ManageLayoutProps) => {
     <>
       <AppHeader />
       <main className="flex-1">{children}</main>
-      {children}
     </>
   );
 };

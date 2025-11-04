@@ -27,15 +27,23 @@ export async function requireAuth(
   }
 ) {
   const headersList = await headers();
+  let session;
+
   try {
-    const session = await auth.api.getSession({
+    session = await auth.api.getSession({
       headers: headersList,
     });
-    if (!session) {
-      redirect(options.redirectTo || "/login");
-    }
-    return session;
   } catch (error) {
+    // If getSession throws an error, redirect to login
+    // Note: redirect() throws internally, so it will stop execution here
     redirect(options.redirectTo || "/login");
   }
+
+  // Check if session exists and has a user
+  if (!session || !session.user) {
+    // redirect() throws internally, so execution stops here
+    redirect(options.redirectTo || "/login");
+  }
+
+  return session;
 }

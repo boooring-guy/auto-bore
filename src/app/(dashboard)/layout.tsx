@@ -7,6 +7,7 @@ type DashboardLayoutProps = {
 };
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+  
   return (
     <SidebarProvider>
       <AppSidebar />

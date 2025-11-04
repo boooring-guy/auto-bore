@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
+import {
+  baseProcedure,
+  createTRPCRouter,
+  premiumProcedure,
+  protectedProcedure,
+} from "../init";
 import { db, user, workflows } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { EVENTS } from "@/inngest/events";
@@ -17,7 +22,7 @@ export const appRouter = createTRPCRouter({
   }),
 
   // Test AI from google
-  testAI: baseProcedure.mutation(async ({ ctx }) => {
+  testAI: premiumProcedure.mutation(async ({ ctx }) => {
     // throw new TRPCError({
     //   code: "BAD_REQUEST",
     //   message: "AI testing is not implemented yet for testing purpose",

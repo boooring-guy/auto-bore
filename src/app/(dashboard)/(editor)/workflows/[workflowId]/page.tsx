@@ -1,3 +1,4 @@
+import { requireAuth } from "@/modules/auth/helpers/requireAuth";
 import { WorkflowIdPageView } from "@/modules/workflows/views/WorkflowIdPageView";
 
 type Props = {
@@ -5,6 +6,7 @@ type Props = {
 };
 
 export default async function WorkflowIdPage(props: Props) {
+  await requireAuth();
   const { workflowId } = await props.params;
   return <WorkflowIdPageView workflowId={workflowId} />;
 }

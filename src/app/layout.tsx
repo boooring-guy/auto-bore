@@ -40,7 +40,7 @@ export default function RootLayout({
           themes={["light", "dark", "system", "azure", "emerald", "violet"]}
         >
           <TRPCReactProvider>
-            <Toaster />
+            <Toaster richColors />
             {children}
           </TRPCReactProvider>
         </ThemeProvider>
