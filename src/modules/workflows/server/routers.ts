@@ -7,8 +7,9 @@ import {
 } from "@/trpc/init"
 import { z } from "zod"
 import { generateSlug } from "random-word-slugs"
-import { and, desc, eq } from "drizzle-orm"
+import { and, desc, eq, ilike, like } from "drizzle-orm"
 import { TRPCError } from "@trpc/server"
+import { PAGINATION } from "@/config/constants"
 
 export const workflowsRouter = createTRPCRouter({
   // Create a new workflow (Premium feature)
@@ -32,14 +33,56 @@ export const workflowsRouter = createTRPCRouter({
     }),
 
   // Get all workflows for the authenticated user
-  getMany: protectedProcedure.query(async ({ ctx }) => {
-    const wflows = await db.query.workflows.findMany({
-      where: eq(workflows.userId, ctx.auth.user.id),
-      orderBy: [desc(workflows.createdAt)],
-    })
-    return { data: wflows }
-    // todo: cursor, pagination and search etc...
-  }),
+  getMany: protectedProcedure
+    .input(
+      z.object({
+        page: z.number().optional().default(PAGINATION.DEFAULT_PAGE),
+        pageSize: z
+          .number()
+          .min(PAGINATION.MIN_PAGE_SIZE)
+          .max(PAGINATION.MAX_PAGE_SIZE)
+          .optional()
+          .default(PAGINATION.DEFAULT_PAGE_SIZE),
+        search: z.string().optional().default(PAGINATION.DEFAULT_SEARCH),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const { page, pageSize, search } = input
+      const [wflows, totalCount] = await Promise.all([
+        db.query.workflows.findMany({
+          limit: pageSize,
+          offset: (page - 1) * pageSize,
+          where: and(
+            eq(workflows.userId, ctx.auth.user.id),
+            ilike(workflows.name, `%${search}%`)
+          ),
+          orderBy: desc(workflows.createdAt),
+        }),
+        // count total number of workflows
+        db.$count(
+          workflows,
+          and(
+            eq(workflows.userId, ctx.auth.user.id),
+            ilike(workflows.name, `%${search}%`)
+          )
+        ),
+      ])
+      const totalPages = Math.ceil(totalCount / pageSize)
+      const hasNextPage = page < totalPages
+      const hasPreviousPage = page > 1
+
+      return {
+        data: wflows, // TODO: map to respective NODE
+        meta: {
+          totalCount,
+          page,
+          pageSize,
+          totalPages,
+          hasNextPage,
+          hasPreviousPage,
+        },
+      }
+    }),
 
   // Get a single workflow by ID
   getOne: protectedProcedure

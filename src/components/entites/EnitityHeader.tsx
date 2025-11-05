@@ -1,5 +1,6 @@
-import { Loader2, PlusIcon } from "lucide-react"
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
+import { Loader2 } from "lucide-react"
+import { PlusIcon } from "lucide-react"
 import Link from "next/link"
 
 type EnitityHeaderProps = {
@@ -56,37 +57,6 @@ export const EntityHeader = ({
           </Link>
         </Button>
       )}
-    </div>
-  )
-}
-
-interface EnitityContainerProps {
-  header?: React.ReactNode
-  search?: React.ReactNode
-  pagination?: React.ReactNode
-  children: React.ReactNode
-}
-
-export const EntityContainer = ({
-  header,
-  search,
-  pagination,
-  children,
-}: EnitityContainerProps) => {
-  return (
-    <div className="p-4 md: px-10 md: py-6 h-full">
-      <div
-        className="mx-auto w-full max-w-7xl flex flex-col
-gap-y-8 h-full"
-      >
-        {header}
-
-        <div className="flex flex-col gap-y-4 h-full">
-          {search}
-          {children}
-          {pagination}
-        </div>
-      </div>
     </div>
   )
 }
