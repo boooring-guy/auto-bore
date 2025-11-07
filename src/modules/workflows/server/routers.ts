@@ -137,6 +137,21 @@ export const workflowsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      // check if the workflow exists
+      const workflow = await db.query.workflows.findFirst({
+        where: and(
+          eq(workflows.id, input.id),
+          eq(workflows.userId, ctx.auth.user.id)
+        ),
+      })
+      if (!workflow) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Workflow not found",
+        })
+      }
+
+      // delete the workflow
       await db
         .delete(workflows)
         .where(
@@ -145,6 +160,6 @@ export const workflowsRouter = createTRPCRouter({
             eq(workflows.userId, ctx.auth.user.id)
           )
         )
-      return { data: "Workflow deleted successfully" }
+      return { data: workflow } // return the id of the workflow that was removed
     }),
 })

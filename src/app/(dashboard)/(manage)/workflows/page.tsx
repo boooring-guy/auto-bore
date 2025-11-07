@@ -1,6 +1,8 @@
 import { requireAuth } from "@/modules/auth/helpers/requireAuth"
 import WorkflowsList, {
   WorkflowsContainer,
+  WorkflowsLoading,
+  WorkflowsError,
 } from "@/modules/workflows/components/workflows"
 import { HydrateClient } from "@/trpc/server"
 import { prefetchWorkflows } from "@/modules/workflows/server/prefetch"
@@ -20,8 +22,12 @@ export default async function WorkflowsPage({ searchParams }: Props) {
   return (
     <WorkflowsContainer>
       <HydrateClient>
-        <ErrorBoundary fallback={<div>Something went wrong</div>}>
-          <Suspense fallback={<div>Loading...</div>}>
+        <ErrorBoundary
+          fallback={
+            <WorkflowsError error={new Error("Sorry, something went wrong")} />
+          }
+        >
+          <Suspense fallback={<WorkflowsLoading />}>
             <WorkflowsList />
           </Suspense>
         </ErrorBoundary>

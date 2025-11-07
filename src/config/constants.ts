@@ -7,4 +7,5 @@ export const PAGINATION = {
   DEFAULT_SORT_ORDER: "desc",
   DEFAULT_SEARCH: "",
 }
- 
+
+export const USUAL_DEBOUNCE_MS = 500
