@@ -113,20 +113,20 @@ export const workflowsRouter = createTRPCRouter({
       z.object({
         id: z.string(),
         name: z.string(),
-        description: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await db
+      const [updatedWorkflow] = await db
         .update(workflows)
-        .set({ name: input.name, description: input.description })
+        .set({ name: input.name })
         .where(
           and(
             eq(workflows.id, input.id),
             eq(workflows.userId, ctx.auth.user.id)
           )
         )
-      return { data: "Workflow name updated successfully" }
+        .returning()
+      return { data: updatedWorkflow }
     }),
 
   // Delete a workflow by ID
