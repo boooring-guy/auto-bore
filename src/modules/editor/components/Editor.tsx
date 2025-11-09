@@ -15,9 +15,12 @@ import {
   Controls,
   MiniMap,
   NodeTypes,
+  Panel,
+  Position,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import { nodeComponents } from "@/config/node-components"
+import AddNewNodeButton from "./AddNewNode"
 
 type EditorProps = {
   workflowId: string
@@ -58,6 +61,12 @@ export function Editor({ workflowId }: EditorProps) {
         <Background />
         <Controls />
         <MiniMap />
+        <Panel
+          position={"top-right"}
+          className="bg-background   rounded-lg border border-border"
+        >
+          <AddNewNodeButton />
+        </Panel>
       </ReactFlow>
     </div>
   )
