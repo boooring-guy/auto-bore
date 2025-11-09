@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import {
   CreditCardIcon,
   FolderIcon,
@@ -16,7 +16,7 @@ import {
   StarIcon,
   Loader2,
   LogInIcon,
-} from "lucide-react";
+} from "lucide-react"
 
 import {
   Sidebar,
@@ -31,15 +31,15 @@ import {
   SidebarSeparator,
   SidebarRail,
   useSidebar,
-} from "@/components/ui/sidebar";
-import Link from "next/link";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Logo } from "@/components/logo";
-import { usePathname, useRouter } from "next/navigation";
-import { LoginButton, ProfileButton, useUser } from "@/modules/auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { authClient } from "@/lib/auth-client";
-import { useHasActiveSubscription } from "@/modules/subscriptions/hooks/useSubscription";
+} from "@/components/ui/sidebar"
+import Link from "next/link"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Logo } from "@/components/logo"
+import { usePathname, useRouter } from "next/navigation"
+import { LoginButton, ProfileButton, useUser } from "@/modules/auth"
+import { ThemeSwitcher } from "@/components/theme-switcher"
+import { authClient } from "@/lib/auth-client"
+import { useHasActiveSubscription } from "@/modules/subscriptions/hooks/useSubscription"
 
 const sidebarItems = [
   {
@@ -63,16 +63,16 @@ const sidebarItems = [
       },
     ],
   },
-];
+]
 
 export function AppSidebar() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { state } = useSidebar();
-  const { isLoading: isLoadingUser, session, user } = useUser();
-  const isCollapsed = state === "collapsed";
+  const router = useRouter()
+  const pathname = usePathname()
+  const { state } = useSidebar()
+  const { isLoading: isLoadingUser, session, user } = useUser()
+  const isCollapsed = state === "collapsed"
   const { hasActiveSubscription, isLoading: isLoadingSubscription } =
-    useHasActiveSubscription();
+    useHasActiveSubscription()
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="">
@@ -105,10 +105,10 @@ export function AppSidebar() {
                           pathname.startsWith(item.href))
                       }
                       onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        router.push(item.href);
-                        router.refresh();
+                        e.preventDefault()
+                        e.stopPropagation()
+                        router.push(item.href)
+                        router.refresh()
                       }}
                       className="gap-x-2 px-4 h10"
                     >
@@ -135,7 +135,7 @@ export function AppSidebar() {
               onClick={() => {
                 authClient.checkout({
                   slug: "pro",
-                });
+                })
               }}
             >
               <StarIcon className="size-4 text-muted-foreground" />
@@ -152,7 +152,7 @@ export function AppSidebar() {
             className="gap-x-4 h-10 px-4"
             tooltip={"Billing"}
             onClick={() => {
-              authClient.customer.portal();
+              authClient.customer.portal()
             }}
           >
             <CreditCardIcon className="size-4 text-muted-foreground" />
@@ -173,7 +173,7 @@ export function AppSidebar() {
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
-        <SidebarSeparator />
+        <SidebarSeparator className="mx-auto" />
         {/* Profile and Theme Switcher */}
         <SidebarMenuItem>
           <div
@@ -207,5 +207,5 @@ export function AppSidebar() {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  );
+  )
 }

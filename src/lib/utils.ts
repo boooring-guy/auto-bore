@@ -14,6 +14,8 @@ export function cn(...inputs: ClassValue[]) {
  */
 export const TABLE_PREFIX_MAP = {
   workflows: "wfl",
+  nodes: "nd",
+  connections: "conn",
 } as const
 
 export type TableName = keyof typeof TABLE_PREFIX_MAP

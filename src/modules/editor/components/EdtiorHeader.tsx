@@ -49,15 +49,15 @@ export function EditorNameInput({ workflowId }: Props) {
   const queryClient = useQueryClient()
   const trpc = useTRPC()
   const [isEditing, setIsEditing] = useState(false)
-  const [name, setName] = useState(workflow.data.name)
+  const [name, setName] = useState(workflow.name)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Sync name state when workflow data changes (only when not editing)
   useEffect(() => {
     if (!isEditing) {
-      setName(workflow.data.name)
+      setName(workflow.name)
     }
-  }, [workflow.data.name, isEditing])
+  }, [workflow.name, isEditing])
 
   // focus the input when editing
   useEffect(() => {
@@ -69,12 +69,12 @@ export function EditorNameInput({ workflowId }: Props) {
   const handleSave = async () => {
     if (!isEditing) return
     // check if the name is same as the current name
-    if (name === workflow.data.name) {
+    if (name === workflow.name) {
       setIsEditing(false)
       return
     }
     if (!name.trim()) {
-      setName(workflow.data.name)
+      setName(workflow.name)
       setIsEditing(false)
       return
     }
@@ -87,10 +87,8 @@ export function EditorNameInput({ workflowId }: Props) {
 
     // Optimistically update the cache
     queryClient.setQueryData(queryOptions.queryKey, {
-      data: {
-        ...workflow.data,
-        name: trimmedName,
-      },
+      ...workflow,
+      name: trimmedName,
     })
 
     // Also update the displayed name immediately
@@ -116,7 +114,7 @@ export function EditorNameInput({ workflowId }: Props) {
     if (e.key === "Enter") {
       handleSave()
     } else if (e.key === "Escape") {
-      setName(workflow.data.name)
+      setName(workflow.name)
       setIsEditing(false)
     }
   }
@@ -134,7 +132,7 @@ export function EditorNameInput({ workflowId }: Props) {
             onChange={(e) => setName(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={handleSave}
-            placeholder={workflow.data.name}
+            placeholder={workflow.name}
             disabled={updateWorkflowName.isPending}
           />
           <InputGroupAddon align="inline-end">
@@ -147,7 +145,7 @@ export function EditorNameInput({ workflowId }: Props) {
 
   return (
     <BreadcrumbItem className="cursor-pointer transition-colors hover:text-foreground">
-      <p onClick={() => setIsEditing(true)}>{workflow.data.name}</p>
+      <p onClick={() => setIsEditing(true)}>{workflow.name}</p>
     </BreadcrumbItem>
   )
 }

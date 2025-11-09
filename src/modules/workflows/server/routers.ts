@@ -1,5 +1,7 @@
 import { db } from "@/lib/db"
-import { workflows } from "@/lib/db/schema"
+import { nodes, workflows, connections } from "@/lib/db/schema"
+import { NodeType } from "@/lib/db/NodeType"
+import type { Node, Edge, Position } from "@xyflow/react"
 import {
   createTRPCRouter,
   premiumProcedure,
@@ -7,7 +9,7 @@ import {
 } from "@/trpc/init"
 import { z } from "zod"
 import { generateSlug } from "random-word-slugs"
-import { and, desc, eq, ilike, like } from "drizzle-orm"
+import { and, desc, eq, ilike } from "drizzle-orm"
 import { TRPCError } from "@trpc/server"
 import { PAGINATION } from "@/config/constants"
 
@@ -21,15 +23,43 @@ export const workflowsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const [newWorkflow] = await db
-        .insert(workflows)
-        .values({
-          name: input.name || generateSlug(3),
-          description: input.description,
-          userId: ctx.auth.user.id,
-        })
-        .returning()
-      return { data: newWorkflow }
+      const completeWorkflow = await db.transaction(async (tx) => {
+        // this tx inculudes a workflow, a node, and a connection
+        // 1. Create a workflow
+        const [newWorkflow] = await tx
+          .insert(workflows)
+          .values({
+            name: input.name || generateSlug(3),
+            description: input.description,
+            userId: ctx.auth.user.id,
+          })
+          .returning()
+        // 2. Create a node
+        const newNodes = await tx
+          .insert(nodes)
+          .values([
+            {
+              workflowId: newWorkflow.id,
+              name: "Initial Node",
+              position: {
+                x: 0,
+                y: 0,
+              },
+              type: NodeType.INITIAL,
+              data: {},
+            },
+          ])
+          .returning({
+            id: nodes.id,
+            position: nodes.position,
+            data: nodes.data,
+            type: nodes.type,
+            workflowId: nodes.workflowId,
+          })
+        return newWorkflow
+      })
+
+      return { data: completeWorkflow }
     }),
 
   // Get all workflows for the authenticated user
@@ -97,14 +127,53 @@ export const workflowsRouter = createTRPCRouter({
           eq(workflows.id, input.id),
           eq(workflows.userId, ctx.auth.user.id)
         ),
+        with: {
+          nodes: true,
+        },
       })
+
       if (!workflow) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Workflow not found",
         })
       }
-      return { data: workflow }
+
+      const reactFlowNodes: Node[] =
+        workflow?.nodes?.map((node) => {
+          return {
+            id: node.id,
+            type: node.type,
+            position: node.position as { x: number; y: number },
+            data: (node.data as Record<string, unknown>) || {},
+          }
+        }) || []
+
+      // Query connections separately to handle case where table might not exist
+      let reactFlowConnections: Edge[] = []
+      try {
+        const workflowConnections = await db.query.connections.findMany({
+          where: eq(connections.workflowId, workflow.id),
+        })
+        reactFlowConnections = workflowConnections.map((connection) => {
+          return {
+            id: connection.id,
+            source: connection.fromNodeId,
+            target: connection.toNodeId,
+            sourceHandle: connection.fromOutput,
+            targetHandle: connection.toInput,
+          }
+        })
+      } catch (error) {
+        // If connections table doesn't exist or query fails, return empty array
+        reactFlowConnections = []
+      }
+
+      return {
+        ...workflow,
+        nodes: reactFlowNodes,
+        connections: reactFlowConnections,
+      }
     }),
 
   // Update a workflow's name and description

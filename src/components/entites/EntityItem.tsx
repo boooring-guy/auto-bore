@@ -101,7 +101,7 @@ export const EntityItem = <T,>({
       <Card
         className={cn(
           " duration-300  transform  hover:scale-[1.002]  shadow-none ",
-          "border-2 border-transparent hover:border-primary transition-all ease-in-out  bg-linear-to-b from-white/60 to-white/40 dark:from-slate-900/60 dark:to-slate-900/40",
+          "border-2 border-transparent hover:border-accent transition-all ease-in-out  bg-card",
           "group cursor-pointer overflow-hidden",
           isRemoving && "cursor-not-allowed opacity-60",
           densityClasses,
