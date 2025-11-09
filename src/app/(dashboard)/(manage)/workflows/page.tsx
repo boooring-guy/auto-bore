@@ -3,13 +3,13 @@ import WorkflowsList, {
   WorkflowsContainer,
   WorkflowsLoading,
   WorkflowsError,
-} from "@/modules/workflows/components/workflows"
+} from "@/modules/triggers/components/workflows/components/workflows"
 import { HydrateClient } from "@/trpc/server"
-import { prefetchWorkflows } from "@/modules/workflows/server/prefetch"
+import { prefetchWorkflows } from "@/modules/triggers/components/workflows/server/prefetch"
 import { ErrorBoundary } from "react-error-boundary"
 import { Suspense } from "react"
 import type { SearchParams } from "nuqs/server"
-import { workFlowParamsLoader } from "@/modules/workflows/server/paramsLoader"
+import { workFlowParamsLoader } from "@/modules/triggers/components/workflows/server/paramsLoader"
 type Props = {
   searchParams: Promise<SearchParams>
 }

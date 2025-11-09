@@ -36,6 +36,8 @@ export const workflows = pgTable(
 
 export const nodeType = pgEnum("node_type", [
   NodeType.INITIAL,
+  NodeType.MANUAL_TRIGGER,
+  NodeType.HTTP_REQUEST,
   NodeType.ACTION,
   NodeType.CONDITION,
   NodeType.LOOP,

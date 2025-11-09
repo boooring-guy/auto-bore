@@ -1,5 +1,5 @@
 "use client"
-import { useSuspenseWorkflow } from "@/modules/workflows/hooks/useWorkflow"
+import { useSuspenseWorkflow } from "@/modules/triggers/components/workflows/hooks/useWorkflow"
 import { useState, useCallback } from "react"
 import {
   ReactFlow,

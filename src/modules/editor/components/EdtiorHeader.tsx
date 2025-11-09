@@ -14,7 +14,7 @@ import Link from "next/link"
 import {
   useSuspenseWorkflow,
   useUpdateWorkflowName,
-} from "@/modules/workflows/hooks/useWorkflow"
+} from "@/modules/triggers/components/workflows/hooks/useWorkflow"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
 import { useTRPC } from "@/trpc/client"

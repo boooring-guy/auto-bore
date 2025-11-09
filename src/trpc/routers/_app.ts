@@ -1,14 +1,14 @@
-import { z } from "zod";
+import { z } from "zod"
 import {
   baseProcedure,
   createTRPCRouter,
   premiumProcedure,
   protectedProcedure,
-} from "../init";
-import { workflowsRouter } from "@/modules/workflows/server/routers";
+} from "../init"
+import { workflowsRouter } from "@/modules/triggers/components/workflows/server/routers"
 
 export const appRouter = createTRPCRouter({
   workflows: workflowsRouter,
-});
+})
 // export type definition of API
-export type AppRouter = typeof appRouter;
+export type AppRouter = typeof appRouter

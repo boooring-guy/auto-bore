@@ -1,5 +1,5 @@
 import { requireAuth } from "@/modules/auth/helpers/requireAuth"
-import { prefetchWorkflow } from "@/modules/workflows/server/prefetch"
+import { prefetchWorkflow } from "@/modules/triggers/components/workflows/server/prefetch"
 import { WorkflowIdPageView } from "@/modules/editor/views/WorkflowIdPageView"
 import { HydrateClient } from "@/trpc/server"
 import { ErrorBoundary } from "react-error-boundary"
