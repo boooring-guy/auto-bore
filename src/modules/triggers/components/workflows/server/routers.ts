@@ -176,6 +176,142 @@ export const workflowsRouter = createTRPCRouter({
       }
     }),
 
+  // Update Functionality for Workflow
+  // Update a workflow's name and description
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        edges: z.array(
+          z.object({
+            source: z.string(),
+            target: z.string(),
+            sourceHandle: z.string().nullish(),
+            targetHandle: z.string().nullish(),
+          })
+        ),
+        nodes: z.array(
+          z.object({
+            id: z.string(),
+            position: z.object({
+              x: z.number(),
+              y: z.number(),
+            }),
+            type: z.string().nullish(),
+            data: z.record(z.string(), z.any()).optional(),
+            name: z.string().optional(),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // update the workflow nodes and edges
+      const { nodes: nodesInput, edges: edgesInput } = input
+      try {
+        const workflow = await db.query.workflows.findFirst({
+          where: and(
+            eq(workflows.id, input.id),
+            eq(workflows.userId, ctx.auth.user.id)
+          ),
+        })
+        if (!workflow) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Workflow not found",
+          })
+        }
+
+        // Transaction to update the workflow nodes and edges
+        const updateWorkflowTx = await db.transaction(async (TX) => {
+          // 1. Delete all existing nodes and edges (it will cascade delete the connections)
+          await TX.delete(nodes).where(eq(nodes.workflowId, workflow.id))
+
+          // 2. Create new nodes
+          // Valid database enum values (subset of NodeType)
+          // To make database compatible, we need to convert the type to a valid database NodeType
+          const validNodeTypes = [
+            NodeType.INITIAL,
+            NodeType.MANUAL_TRIGGER,
+            NodeType.HTTP_REQUEST,
+            NodeType.ACTION,
+            NodeType.CONDITION,
+            NodeType.LOOP,
+          ] as const
+
+          // Only insert nodes if there are any to insert
+          let insertedNodeIds: Set<string> = new Set()
+          if (nodesInput.length > 0) {
+            const newNodes = await TX.insert(nodes)
+              .values(
+                nodesInput.map((eachNode) => {
+                  // Validate and convert type to a valid database NodeType
+                  const nodeType =
+                    eachNode.type &&
+                    validNodeTypes.includes(
+                      eachNode.type as (typeof validNodeTypes)[number]
+                    )
+                      ? (eachNode.type as (typeof validNodeTypes)[number])
+                      : NodeType.INITIAL
+
+                  return {
+                    id: eachNode.id,
+                    workflowId: workflow.id,
+                    position: eachNode.position as { x: number; y: number },
+                    type: nodeType,
+                    data: eachNode.data || {},
+                    name: eachNode.name || "unknown",
+                  }
+                })
+              )
+              .returning()
+            insertedNodeIds = new Set(newNodes.map((node) => node.id))
+          }
+
+          // 3. Create new edges/connections
+          // Only insert edges if there are nodes and edges to connect
+          // Filter out edges that reference non-existent nodes
+          if (edgesInput.length > 0 && insertedNodeIds.size > 0) {
+            const validEdges = edgesInput.filter(
+              (edge) =>
+                insertedNodeIds.has(edge.source) &&
+                insertedNodeIds.has(edge.target)
+            )
+
+            if (validEdges.length > 0) {
+              // Then insert the edges
+              await TX.insert(connections).values(
+                validEdges.map((eachEdge) => ({
+                  workflowId: workflow.id,
+                  fromNodeId: eachEdge.source,
+                  toNodeId: eachEdge.target,
+                  fromOutput: eachEdge.sourceHandle || "",
+                  toInput: eachEdge.targetHandle || "",
+                }))
+              )
+            }
+          }
+
+          // 4. Finally update the timestamps
+          await TX.update(workflows)
+            .set({
+              updatedAt: new Date(),
+            })
+            .where(eq(workflows.id, workflow.id))
+
+          return { workflow: workflow }
+        })
+
+        return updateWorkflowTx
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update workflow",
+          cause: error,
+        })
+      }
+    }),
+  // --
+
   // Update a workflow's name and description
   updateName: protectedProcedure
     .input(

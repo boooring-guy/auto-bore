@@ -21,11 +21,20 @@ export function WorkflowNode({
   return (
     <>
       {showToolbar && (
-        <NodeToolbar>
+        <NodeToolbar position={Position.Top}>
           <Button variant="ghost" size="icon" onClick={onSettings}>
             <SettingsIcon className="size-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onDelete}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              console.log("Delete button clicked", { hasOnDelete: !!onDelete })
+              onDelete?.()
+            }}
+          >
             <TrashIcon className="size-4" />
           </Button>
         </NodeToolbar>

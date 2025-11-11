@@ -13,6 +13,7 @@ import {
 import Link from "next/link"
 import {
   useSuspenseWorkflow,
+  useUpdateWorkflow,
   useUpdateWorkflowName,
 } from "@/modules/triggers/components/workflows/hooks/useWorkflow"
 import { toast } from "sonner"
@@ -25,6 +26,11 @@ import {
 } from "@/components/ui/input-group"
 import { Spinner } from "@/components/ui/spinner"
 import React, { useState, useEffect, useRef } from "react"
+import { editorReactFlowAtom } from "@/atoms/stateAtoms"
+import { useAtomValue } from "jotai"
+import { SaveIcon } from "lucide-react"
+import { EditorSettings } from "./EditorSettings"
+import { settingsAtom } from "@/config/settings"
 
 type Props = {
   workflowId: string
@@ -33,12 +39,34 @@ type Props = {
 // Breadcrumb
 
 // save button
-export function EditorHeaderSaveButton() {
+export function EditorHeaderSaveButton({ workflowId }: Props) {
+  const saveWorkflow = useUpdateWorkflow()
+  const editorReactFlow = useAtomValue(editorReactFlowAtom)
+  const settings = useAtomValue(settingsAtom)
+  const handleSave = async () => {
+    if (!editorReactFlow) return
+    const nodes = editorReactFlow.getNodes()
+    const edges = editorReactFlow.getEdges()
+    await saveWorkflow.mutateAsync({
+      id: workflowId,
+      nodes,
+      edges,
+    })
+  }
   return (
-    <div className="ml-auto">
-      <Button variant="outline" size="sm" onClick={() => {}} disabled={false}>
-        Save
+    <div className="ml-auto flex items-center gap-2">
+      {settings.autoSave && (
+        <span className="text-xs text-muted-foreground">Auto-saving...</span>
+      )}
+      <Button
+        variant="outline"
+        size="icon-lg"
+        onClick={handleSave}
+        disabled={saveWorkflow.isPending}
+      >
+        {saveWorkflow.isPending ? <Spinner /> : <SaveIcon />}
       </Button>
+      <EditorSettings workflowId={workflowId} />
     </div>
   )
 }
@@ -170,7 +198,7 @@ export function EdtiorHeader({ workflowId }: Props) {
     <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4 bg-background">
       <SidebarTrigger />
       <EditorHeaderBreadcrumb workflowId={workflowId} />
-      <EditorHeaderSaveButton />
+      <EditorHeaderSaveButton workflowId={workflowId} />
     </header>
   )
 }

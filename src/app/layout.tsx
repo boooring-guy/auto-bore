@@ -5,7 +5,7 @@ import "./globals.css"
 import { Toaster } from "sonner"
 import { TRPCReactProvider } from "@/trpc/client"
 import { ThemeProvider } from "@/components/theme-provider"
-
+import { Provider as JotaiProvider } from "jotai"
 const rubikSans = Rubik({
   variable: "--font-rubik",
   subsets: ["latin"],
@@ -33,20 +33,34 @@ export default function RootLayout({
       <body
         className={`${rubikSans.className} ${geistMono.variable} antialiased`}
       >
-        <NuqsAdapter>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-            themes={["light", "dark", "system", "azure", "emerald", "violet"]}
-          >
-            <TRPCReactProvider>
-              <Toaster richColors />
-              {children}
-            </TRPCReactProvider>
-          </ThemeProvider>
-        </NuqsAdapter>
+        <JotaiProvider>
+          <NuqsAdapter>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+              themes={[
+                "light",
+                "dark",
+                "system",
+                "azure",
+                "emerald",
+                "violet",
+                "fuchsia",
+                "azure-dark",
+                "emerald-dark",
+                "violet-dark",
+                "fuchsia-dark",
+              ]}
+            >
+              <TRPCReactProvider>
+                <Toaster richColors />
+                {children}
+              </TRPCReactProvider>
+            </ThemeProvider>
+          </NuqsAdapter>
+        </JotaiProvider>
       </body>
     </html>
   )

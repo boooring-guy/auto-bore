@@ -9,7 +9,7 @@ export const AddNewNodeButton = memo(() => {
   const [open, setOpen] = useAtom(nodeSelectorAtom)
   return (
     <NodeSelector open={open} onOpenChange={setOpen}>
-      <Button variant="ghost" size="icon" onClick={() => setOpen(true)}>
+      <Button variant="ghost" size="icon" /* onClick={() => setOpen(true)} */>
         <PlusIcon className="size-4" />
       </Button>
     </NodeSelector>

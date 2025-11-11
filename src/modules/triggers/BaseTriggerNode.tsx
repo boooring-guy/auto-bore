@@ -4,10 +4,14 @@ import { BaseNode, BaseNodeContent } from "@/components/react-flows/base-node"
 import { memo, type ReactNode, useCallback } from "react"
 import { BaseHandle } from "@/components/react-flows/base-handle"
 import { WorkflowNode } from "@/components/react-flows/WorkflowNode"
-import { NodeProps, Position } from "@xyflow/react"
+import { NodeProps, Position, useReactFlow } from "@xyflow/react"
 import { LucideIcon } from "lucide-react"
+import { toast } from "sonner"
+import { useAtomValue } from "jotai"
+import { editorReactFlowAtom } from "@/atoms/stateAtoms"
 
 interface BaseTriggerNodeProps extends NodeProps {
+  id: string
   icon: LucideIcon | string
   name: string
   description?: string
@@ -19,6 +23,7 @@ interface BaseTriggerNodeProps extends NodeProps {
 
 export const BaseTriggerNode = memo(
   ({
+    id,
     icon: Icon,
     name,
     description,
@@ -26,10 +31,22 @@ export const BaseTriggerNode = memo(
     onSettings,
     onDoubleClick,
   }: BaseTriggerNodeProps) => {
+    const { setNodes, setEdges } = useReactFlow()
     // TODO: Add delete and settings functionality
-    const handleDelete = useCallback(() => {}, [])
+    const handleDelete = useCallback(() => {
+      console.log("handleDelete called", {
+        id,
+        name,
+      })
+      // remove the node from the react flow
+      setNodes((current) => current.filter((node) => node.id !== id))
+      // remove the edges from the react flow
+      setEdges((current) =>
+        current.filter((edge) => edge.source !== id && edge.target !== id)
+      )
+    }, [id, name])
     const handleSettings = useCallback(() => {}, [])
-    console.log("This component is rendered", name)
+
     return (
       <WorkflowNode
         name={name}

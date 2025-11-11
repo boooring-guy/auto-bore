@@ -21,6 +21,9 @@ import {
 import "@xyflow/react/dist/style.css"
 import { nodeComponents } from "@/config/node-components"
 import AddNewNodeButton from "./AddNewNode"
+import { editorReactFlowAtom } from "@/atoms/stateAtoms"
+import { useSetAtom } from "jotai"
+import { useAutoSave } from "@/hooks/useAutoSave"
 
 type EditorProps = {
   workflowId: string
@@ -30,6 +33,10 @@ export function Editor({ workflowId }: EditorProps) {
   const { data: workflow } = useSuspenseWorkflow(workflowId)
   const [nodes, setNodes] = useState<Node[]>(workflow.nodes)
   const [edges, setEdges] = useState<Edge[]>(workflow.connections)
+  const setEditorReactFlow = useSetAtom(editorReactFlowAtom)
+
+  // Enable auto-save based on settings
+  useAutoSave(workflowId)
 
   console.log("nodes", nodes)
   const onNodesChange = useCallback(
@@ -57,6 +64,7 @@ export function Editor({ workflowId }: EditorProps) {
         onConnect={onConnect}
         nodeTypes={nodeComponents}
         fitView
+        onInit={setEditorReactFlow} // set the editor react flow instance to the atom
       >
         <Background />
         <Controls />

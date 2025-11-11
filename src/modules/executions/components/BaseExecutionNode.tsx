@@ -11,10 +11,11 @@ import { HTMLAttributes, forwardRef } from "react"
 import { memo, type ReactNode, useCallback } from "react"
 import { BaseHandle } from "../../../components/react-flows/base-handle"
 import { WorkflowNode } from "../../../components/react-flows/WorkflowNode"
-import { NodeProps, Position } from "@xyflow/react"
+import { NodeProps, Position, useReactFlow } from "@xyflow/react"
 import { LucideIcon } from "lucide-react"
 
 interface BaseExecutionNodeProps extends NodeProps {
+  id: string
   icon: LucideIcon | string
   name: string
   description?: string
@@ -26,6 +27,7 @@ interface BaseExecutionNodeProps extends NodeProps {
 
 export const BaseExecutionNode = memo(
   ({
+    id,
     icon: Icon,
     name,
     description,
@@ -34,7 +36,20 @@ export const BaseExecutionNode = memo(
     onDoubleClick,
   }: BaseExecutionNodeProps) => {
     // TODO: Add delete and settings functionality
-    const handleDelete = useCallback(() => {}, [])
+    const { setNodes, setEdges } = useReactFlow()
+
+    const handleDelete = useCallback(() => {
+      console.log("handleDelete called", {
+        id,
+        name,
+      })
+      // remove the node from the react flow
+      setNodes((current) => current.filter((node) => node.id !== id))
+      // remove the edges from the react flow
+      setEdges((current) =>
+        current.filter((edge) => edge.source !== id && edge.target !== id)
+      )
+    }, [id, setNodes, setEdges])
     const handleSettings = useCallback(() => {}, [])
     console.log("This component is rendered", name)
     return (
