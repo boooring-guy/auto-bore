@@ -1,23 +1,18 @@
-"use client";
+"use client"
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { authClient } from "@/lib/auth-client";
-import { signUpSchema, type SignUpFormData } from "../logic/schemas";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import Image from "next/image"
+import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
+import { signUpSchema, type SignUpFormData } from "../logic/schemas"
+import { Form, FormControl, FormField, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
@@ -25,19 +20,19 @@ import {
   FieldLabel,
   FieldSeparator,
   FieldError,
-} from "@/components/ui/field";
-import { Loader2, Eye, EyeOff } from "lucide-react";
-import { toast } from "sonner";
+} from "@/components/ui/field"
+import { Loader2, Eye, EyeOff } from "lucide-react"
+import { toast } from "sonner"
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const router = useRouter()
 
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
@@ -47,45 +42,47 @@ export function SignUpForm({
       password: "",
       confirmPassword: "",
     },
-  });
+  })
 
   const onSubmit = async (data: SignUpFormData) => {
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
 
     try {
       const result = await authClient.signUp.email({
         email: data.email,
         password: data.password,
         name: data.name,
-      });
+      })
 
       if (result.error) {
         setError(
           result.error.message || "Failed to create account. Please try again."
-        );
-        return;
+        )
+        return
       }
 
       // Success - redirect to home or dashboard
-      toast.success("Account created successfully");
-      router.push("/");
-      router.refresh();
+      toast.success("Account created successfully")
+      router.push("/")
+      router.refresh()
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      setError("An unexpected error occurred. Please try again.")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
-  const handleSocialSignIn = async (provider: "github" | "google" | "apple" | "meta") => {
+  const handleSocialSignIn = async (
+    provider: "github" | "google" | "apple" | "meta"
+  ) => {
     await authClient.signIn.social({
       provider: provider === "meta" ? "facebook" : provider,
       callbackURL: "/",
-    });
-  };
+    })
+  }
 
-  const isDev = process.env.NODE_ENV === "development";
+  const isDev = process.env.NODE_ENV === "development"
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -103,7 +100,7 @@ export function SignUpForm({
                 <div className="flex flex-col items-center gap-2 text-center">
                   <h1 className="text-2xl font-bold">Create an account</h1>
                   <p className="text-muted-foreground text-balance">
-                    Sign up to get started with Acme Inc
+                    Sign up to get started with Auto Bore
                   </p>
                 </div>
 
@@ -282,7 +279,10 @@ export function SignUpForm({
 
                 <FieldDescription className="text-center">
                   Already have an account?{" "}
-                  <Link href="/login" className="underline-offset-2 hover:underline">
+                  <Link
+                    href="/login"
+                    className="underline-offset-2 hover:underline"
+                  >
                     Sign in
                   </Link>
                 </FieldDescription>
@@ -315,5 +315,5 @@ export function SignUpForm({
         .
       </FieldDescription>
     </div>
-  );
+  )
 }

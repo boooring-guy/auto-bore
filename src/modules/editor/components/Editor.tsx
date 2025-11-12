@@ -64,7 +64,12 @@ export function Editor({ workflowId }: EditorProps) {
         onConnect={onConnect}
         nodeTypes={nodeComponents}
         fitView
-        onInit={setEditorReactFlow} // set the editor react flow instance to the atom
+        onInit={setEditorReactFlow}
+        snapGrid={[10, 10]}
+        snapToGrid={true}
+        panOnScroll
+        panOnDrag={false}
+        selectionOnDrag
       >
         <Background />
         <Controls />

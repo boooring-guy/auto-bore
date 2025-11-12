@@ -9,6 +9,10 @@ import { LucideIcon } from "lucide-react"
 import { toast } from "sonner"
 import { useAtomValue } from "jotai"
 import { editorReactFlowAtom } from "@/atoms/stateAtoms"
+import {
+  NodeStatus,
+  NodeStatusIndicator,
+} from "@/components/react-flows/node-status-indicator"
 
 interface BaseTriggerNodeProps extends NodeProps {
   id: string
@@ -18,7 +22,7 @@ interface BaseTriggerNodeProps extends NodeProps {
   children?: ReactNode
   onSettings?: () => void
   onDoubleClick?: () => void
-  // status?: NodeStatus
+  status?: NodeStatus
 }
 
 export const BaseTriggerNode = memo(
@@ -28,6 +32,7 @@ export const BaseTriggerNode = memo(
     name,
     description,
     children,
+    status = "initial",
     onSettings,
     onDoubleClick,
   }: BaseTriggerNodeProps) => {
@@ -56,25 +61,32 @@ export const BaseTriggerNode = memo(
         showToolbar={true}
       >
         {/* TODO: Wrap NodeStatus Indicator */}
-        <BaseNode
-          onDoubleClick={onDoubleClick}
-          className="rounded-l-2xl relative group"
+        <NodeStatusIndicator
+          status={status}
+          variant="border"
+          className="rounded-l-2xl "
         >
-          <BaseNodeContent>
-            {typeof Icon === "string" ? (
-              <Image src={Icon} alt={name} width={16} height={16} />
-            ) : (
-              <Icon className="size-4 text-muted-foreground" />
-            )}
-            {children}
+          <BaseNode
+            status={status}
+            onDoubleClick={onDoubleClick}
+            className="rounded-l-2xl relative group"
+          >
+            <BaseNodeContent>
+              {typeof Icon === "string" ? (
+                <Image src={Icon} alt={name} width={16} height={16} />
+              ) : (
+                <Icon className="size-4 text-muted-foreground" />
+              )}
+              {children}
 
-            <BaseHandle
-              id={"source-1"}
-              type="source"
-              position={Position.Right}
-            />
-          </BaseNodeContent>
-        </BaseNode>
+              <BaseHandle
+                id={"source-1"}
+                type="source"
+                position={Position.Right}
+              />
+            </BaseNodeContent>
+          </BaseNode>
+        </NodeStatusIndicator>
       </WorkflowNode>
     )
   }
